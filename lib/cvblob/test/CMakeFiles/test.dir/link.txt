@@ -1,0 +1,1 @@
+/usr/bin/c++   -O3 -DNDEBUG   CMakeFiles/test.dir/test.o  -o test -rdynamic ../lib/libcvblob.a /usr/local/lib/libcv.so /usr/local/lib/libcxcore.so /usr/local/lib/libhighgui.so /usr/local/lib/libcvaux.so -Wl,-rpath,/usr/local/lib: 
