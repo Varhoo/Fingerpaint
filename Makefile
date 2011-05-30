@@ -11,7 +11,7 @@ CVCFLAGS  += -Wall -g `pkg-config opencv --cflags`
 
 CVLIBS += -I ./lib/h/ `pkg-config opencv --libs`
 
-all: lib poloc detec
+all: cvblob poloc detec
 	
 poloc: main.o detection_class.o ./lib/libcvblob.a
 	$(CXX) $(LIBS) $(CFLAGS) $(CVCFLAGS) $(CVLIBS) $^ -o $@
@@ -19,6 +19,17 @@ poloc: main.o detection_class.o ./lib/libcvblob.a
 detec: detec.o detection_class.o ./lib/libcvblob.a
 	$(CXX) $(CVCFLAGS) $(CVLIBS) $^ -o $@
 	
+cvblob:
+	cd lib/cvblob/; cmake . ; make
+	@echo "-----------------------"
+	@echo "copy library cvblob ..."
+	cp lib/cvblob/lib/libcvblob.a lib/
+	@echo "-----------------------"
+	@echo "copy header file ..."
+	@echo "-----------------------"
+	cp lib/cvblob/cvBlob/*.h lib/h/
+
+
 #objects
 main.o: src/main.cpp
 	$(CXX) $(CFLAGS) $(CVCFLAGS) $(CVLIBS) $(CVCFLAGS) -c $^ -o $@

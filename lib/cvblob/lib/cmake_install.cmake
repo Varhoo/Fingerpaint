@@ -1,4 +1,4 @@
-# Install script for directory: /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob/cvBlob
+# Install script for directory: /home/pavel/Developed/projects/fingerpaint/lib/cvblob/cvBlob
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -33,6 +33,6 @@ IF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 ENDIF(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 
 IF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static" TYPE STATIC_LIBRARY FILES "/home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob/lib/libcvblob.a")
+  FILE(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static" TYPE STATIC_LIBRARY FILES "/home/pavel/Developed/projects/fingerpaint/lib/cvblob/lib/libcvblob.a")
 ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
 

@@ -36,10 +36,10 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob
+CMAKE_SOURCE_DIR = /home/pavel/Developed/projects/fingerpaint/lib/cvblob
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob
+CMAKE_BINARY_DIR = /home/pavel/Developed/projects/fingerpaint/lib/cvblob
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -98,7 +98,7 @@ list_install_components/fast: list_install_components
 # Special rule for the target package
 package: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool..."
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && /usr/bin/cpack --config ./CPackConfig.cmake
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && /usr/bin/cpack --config ./CPackConfig.cmake
 .PHONY : package
 
 # Special rule for the target package
@@ -108,7 +108,7 @@ package/fast: package
 # Special rule for the target package_source
 package_source:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob/CPackSourceConfig.cmake
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/pavel/Developed/projects/fingerpaint/lib/cvblob/CPackSourceConfig.cmake
 .PHONY : package_source
 
 # Special rule for the target package_source
@@ -127,14 +127,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(CMAKE_COMMAND) -E cmake_progress_start /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob/CMakeFiles /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob/lib/CMakeFiles/progress.marks
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob/CMakeFiles 0
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(CMAKE_COMMAND) -E cmake_progress_start /home/pavel/Developed/projects/fingerpaint/lib/cvblob/CMakeFiles /home/pavel/Developed/projects/fingerpaint/lib/cvblob/lib/CMakeFiles/progress.marks
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/pavel/Developed/projects/fingerpaint/lib/cvblob/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/clean
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/clean
 .PHONY : clean
 
 # The main clean target
@@ -143,22 +143,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 lib/CMakeFiles/cvblob.dir/rule:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/CMakeFiles/cvblob.dir/rule
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f CMakeFiles/Makefile2 lib/CMakeFiles/cvblob.dir/rule
 .PHONY : lib/CMakeFiles/cvblob.dir/rule
 
 # Convenience name for target.
@@ -167,97 +167,97 @@ cvblob: lib/CMakeFiles/cvblob.dir/rule
 
 # fast build rule for target.
 cvblob/fast:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/build
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/build
 .PHONY : cvblob/fast
 
 # target to build an object file
 cvaux.o:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvaux.o
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvaux.o
 .PHONY : cvaux.o
 
 # target to preprocess a source file
 cvaux.i:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvaux.i
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvaux.i
 .PHONY : cvaux.i
 
 # target to generate assembly for a file
 cvaux.s:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvaux.s
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvaux.s
 .PHONY : cvaux.s
 
 # target to build an object file
 cvblob.o:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvblob.o
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvblob.o
 .PHONY : cvblob.o
 
 # target to preprocess a source file
 cvblob.i:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvblob.i
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvblob.i
 .PHONY : cvblob.i
 
 # target to generate assembly for a file
 cvblob.s:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvblob.s
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvblob.s
 .PHONY : cvblob.s
 
 # target to build an object file
 cvcolor.o:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcolor.o
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcolor.o
 .PHONY : cvcolor.o
 
 # target to preprocess a source file
 cvcolor.i:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcolor.i
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcolor.i
 .PHONY : cvcolor.i
 
 # target to generate assembly for a file
 cvcolor.s:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcolor.s
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcolor.s
 .PHONY : cvcolor.s
 
 # target to build an object file
 cvcontour.o:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcontour.o
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcontour.o
 .PHONY : cvcontour.o
 
 # target to preprocess a source file
 cvcontour.i:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcontour.i
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcontour.i
 .PHONY : cvcontour.i
 
 # target to generate assembly for a file
 cvcontour.s:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcontour.s
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvcontour.s
 .PHONY : cvcontour.s
 
 # target to build an object file
 cvlabel.o:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvlabel.o
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvlabel.o
 .PHONY : cvlabel.o
 
 # target to preprocess a source file
 cvlabel.i:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvlabel.i
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvlabel.i
 .PHONY : cvlabel.i
 
 # target to generate assembly for a file
 cvlabel.s:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvlabel.s
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvlabel.s
 .PHONY : cvlabel.s
 
 # target to build an object file
 cvtrack.o:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvtrack.o
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvtrack.o
 .PHONY : cvtrack.o
 
 # target to preprocess a source file
 cvtrack.i:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvtrack.i
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvtrack.i
 .PHONY : cvtrack.i
 
 # target to generate assembly for a file
 cvtrack.s:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvtrack.s
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(MAKE) -f lib/CMakeFiles/cvblob.dir/build.make lib/CMakeFiles/cvblob.dir/cvtrack.s
 .PHONY : cvtrack.s
 
 # Help Target
@@ -304,6 +304,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/pavel/School/FIT-MGR/Projects/poloc/lib/cvblob && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/pavel/Developed/projects/fingerpaint/lib/cvblob && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
