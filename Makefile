@@ -3,11 +3,11 @@
 
 GXX=g++
 LIBS= -lm #-lX11 -lXi -lXmu -lglut -lGL -lGLU
-CFLAGS= -Wall -g
+CFLAGS= -Wall -g -o2
 CFLAGS  += `pkg-config gtk+-2.0 --cflags`
 LIBS += `pkg-config gtk+-2.0 --libs`
 
-CVCFLAGS  += -Wall -g `pkg-config opencv --cflags`
+CVCFLAGS  += $(CFLAGS) `pkg-config opencv --cflags`
 CVLIBS += -I ./lib/h/ `pkg-config opencv --libs`
 
 PROGRAM= fingerpaint

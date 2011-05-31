@@ -11,6 +11,10 @@ Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
 
+int TIMER = 200;
+
+double timer[3];
+
 cairo_surface_t * surface;
 cairo_surface_t * image;
 //cairo_t *ci;
@@ -36,6 +40,8 @@ gboolean timeout2(gpointer data){
 gboolean timeout(gpointer data){
 	if(!start) return true;
 
+	double t = Microtime();	
+
 	Detection * detec = ((TimerAction *) data)->det;
 	MousePosition * finger = ((TimerAction *) data)->fin;
 	GtkWidget     *canvas = ((TimerAction *) data)->canvas;
@@ -53,6 +59,7 @@ gboolean timeout(gpointer data){
 
 	gtk_widget_queue_draw (canvas);
 
+	timer[0] =  Microtime() - t;
 	return true;
 }
 
@@ -73,6 +80,8 @@ main (gint    argc,
 		  device = atoi(argv[2]);
 	  }
   }
+
+  printf("Number of device: %d \n",device);
 
   MousePosition  mouse = {0,0,0,0,0,0,0};
 
@@ -159,9 +168,9 @@ main (gint    argc,
   gtk_widget_show_all (settings);
 
   /* Nastavení časovače */
-  g_timeout_add(200, timeout, (gpointer) &timer_action);
+  g_timeout_add(TIMER, timeout, (gpointer) &timer_action);
 
-  g_timeout_add(500, timeout2, (gpointer) &timer_action);
+  g_timeout_add(TIMER, timeout2, (gpointer) &timer_action);
   
   gtk_main ();
 
@@ -176,6 +185,9 @@ static void
 paint_selection (cairo_t       *ci,
                  MousePosition *mouse)
 {
+
+	double t =  Microtime();
+
 	int w = cairo_image_surface_get_width (surface);
 	int h = cairo_image_surface_get_height (surface);
 
@@ -244,6 +256,8 @@ paint_selection (cairo_t       *ci,
 	  cairo_stroke (ci);
 
 	  cairo_restore (ci);
+
+	  timer[1] =  Microtime() - t;
 }
 
 /* funkce která vykesluje */
@@ -252,6 +266,8 @@ static void video (
 		GdkEventExpose *eev){
 
 	gtk_widget_queue_draw(GTK_WIDGET(widget));
+
+	//double t =  Microtime();
 
 	if(!start) return;
 
@@ -268,6 +284,9 @@ static void video (
 		sprintf(buffer,"Treshold %d/255 [key m,n]",treshold);
 		cvPutText (cv_image,buffer,cvPoint(10,20), &font, cvScalar(0,255,0));
 		cvLine(cv_image,cvPoint(260,15),cvPoint(260+treshold,15),cvScalar(0,255,0),10,4,NULL);
+
+		sprintf(buffer,"T1: %f | %f | %f",timer[0],timer[1],timer[2]);
+		cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255,0,0));
 
 		//převedení opencv do gtk
 		GdkPixbuf * pix = gdk_pixbuf_new_from_data(
@@ -291,6 +310,7 @@ static void video (
 		printf("ERROR: Video nebylo načteno.\n");
 	}
 
+	//timer[2] =  Microtime() - t;
 }
 
 static void
@@ -329,6 +349,7 @@ event_keypress_set (GtkWidget     *widget,
 				GdkEventKey *event )
 {
 	switch(event->keyval){
+		//co to je?
 			exit(0);
 	}
 
@@ -356,10 +377,10 @@ event_keypress (GtkWidget     *widget,
 	// vymazání plochy
 	case 'c':
 		{
-		cairo_t * ci = cairo_create (surface);
-	    cairo_set_source_rgb (ci, 0.0,0.0,0.0);
-	    cairo_paint (ci);
-		cairo_destroy (ci);
+			cairo_t * ci = cairo_create (surface);
+			cairo_set_source_rgb (ci, 0.0,0.0,0.0);
+			cairo_paint (ci);
+			cairo_destroy (ci);
 		}
 		break;
 	// spuštění režimu ve fullsreenmodu

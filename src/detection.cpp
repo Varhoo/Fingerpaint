@@ -6,6 +6,7 @@
  */
 
 #include "detection_class.h"
+
 using namespace cvb;
 
 int
@@ -19,6 +20,7 @@ main(	int argc,
 	Detection * detec = new Detection(capture);
 
 	while(1) {
+
 			detec->Next();
 			cvShowImage( "Detection", detec->DebugImage() );
 

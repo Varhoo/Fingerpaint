@@ -23,6 +23,16 @@
 #define DEFAULT_WIDTH  800
 #define DEFAULT_HEIGHT 640
 
+#include  <sys/time.h>
+#include  <time.h>
+
+double Microtime(){
+     timeval tim;
+     gettimeofday(&tim, NULL);
+     return (tim.tv_sec+(tim.tv_usec/1000000.0));
+}
+
+
 /* a structure keeping information about
  * the selection */
 typedef struct
