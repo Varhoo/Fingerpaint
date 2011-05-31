@@ -8,12 +8,13 @@ CFLAGS  += `pkg-config gtk+-2.0 --cflags`
 LIBS += `pkg-config gtk+-2.0 --libs`
 
 CVCFLAGS  += -Wall -g `pkg-config opencv --cflags`
-
 CVLIBS += -I ./lib/h/ `pkg-config opencv --libs`
 
-all: cvblob poloc detec
+PROGRAM= fingerpaint
+
+all: cvblob $(PROGRAM) detec
 	
-poloc: main.o detection_class.o ./lib/libcvblob.a
+$(PROGRAM): main.o detection_class.o ./lib/libcvblob.a
 	$(CXX) $(LIBS) $(CFLAGS) $(CVCFLAGS) $(CVLIBS) $^ -o $@
 
 detec: detec.o detection_class.o ./lib/libcvblob.a
