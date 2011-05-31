@@ -2,7 +2,7 @@
 # author: Pavel Studeník
 
 GXX=g++
-LIBS= -lX11 -lXi -lXmu -lglut -lGL -lGLU -lm 
+LIBS= -lm #-lX11 -lXi -lXmu -lglut -lGL -lGLU
 CFLAGS= -Wall -g
 CFLAGS  += `pkg-config gtk+-2.0 --cflags`
 LIBS += `pkg-config gtk+-2.0 --libs`
