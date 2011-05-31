@@ -1,10 +1,17 @@
 
-#Instalce balíčků pro ubuntu 10.10
+#First you able to install this package for Ubuntu 10.10 +
 
-	#gtk
+#gtk
 	sudo apt-get install libgtk2.0-dev
-	#opencv
+#opencv
 	sudo apt-get install libcv-dev libcvaux-dev libhighgui-dev
-
-	#python
+#python
 	sudo apt-get install python-opencv
+#comipile
+	sudo apt-get install cmake g++
+
+
+#Only one line:
+	sudo apt-get install libgtk2.0-dev libcv-dev libcvaux-dev libhighgui-dev python-opencv cmake g++
+
+
