@@ -5,7 +5,7 @@ GXX=g++
 LIBS= -lm #-lX11 -lXi -lXmu -lglut -lGL -lGLU
 CFLAGS= -Wall -g -o2
 CFLAGS  += `pkg-config gtk+-2.0 --cflags`
-LIBS += `pkg-config gtk+-2.0 --libs`
+LIBS += `pkg-config --cflags --libs gtk+-2.0 gmodule-export-2.0` #`pkg-config gtk+-2.0 --libs`
 
 CVCFLAGS  += $(CFLAGS) `pkg-config opencv --cflags`
 CVLIBS += -I ./lib/h/ `pkg-config opencv --libs`
@@ -15,11 +15,15 @@ PROGRAM= fingerpaint
 all: cvblob $(PROGRAM) detec
 	
 $(PROGRAM): main.o detection_class.o ./lib/libcvblob.a
+#compitle aplication
 	$(CXX) $(LIBS) $(CFLAGS) $(CVCFLAGS) $(CVLIBS) $^ -o $@
+#create dir for saving image
+	@mkdir -p paints
 
 detec: detec.o detection_class.o ./lib/libcvblob.a
 	$(CXX) $(CVCFLAGS) $(CVLIBS) $^ -o $@
-	
+
+#compile external library cvblob
 cvblob:
 	cd lib/cvblob/; cmake . ; make
 	@echo "-----------------------"
@@ -30,6 +34,8 @@ cvblob:
 	@echo "-----------------------"
 	cp lib/cvblob/cvBlob/*.h lib/h/
 
+testgui: gui.cpp
+	$(CXX) $(CFLAGS) $(LIBS) $^ -o $@
 
 #objects
 main.o: src/main.cpp

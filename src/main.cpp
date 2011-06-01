@@ -283,7 +283,7 @@ static void video (
 		cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale,vScale,0,lineWidth);
 		sprintf(buffer,"Treshold %d/255 [key m,n]",treshold);
 		cvPutText (cv_image,buffer,cvPoint(10,20), &font, cvScalar(0,255,0));
-		cvLine(cv_image,cvPoint(260,15),cvPoint(260+treshold,15),cvScalar(0,255,0),10,4,NULL);
+		cvLine(cv_image,cvPoint(260,15),cvPoint(260+treshold,15),cvScalar(0,255,0),10,4);
 
 		sprintf(buffer,"T1: %f | %f | %f",timer[0],timer[1],timer[2]);
 		cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255,0,0));
@@ -311,6 +311,19 @@ static void video (
 	}
 
 	//timer[2] =  Microtime() - t;
+}
+
+void SavePaint(){
+	char buffer[64];
+	sprintf(buffer,"paints/img_%d.png",(int) time(NULL));		
+	cairo_surface_write_to_png (surface, buffer);
+}
+
+void CleanPaint(){
+	cairo_t * ci = cairo_create (surface);
+	cairo_set_source_rgb (ci, 0.0,0.0,0.0);
+	cairo_paint (ci);
+	cairo_destroy (ci);
 }
 
 static void
@@ -344,43 +357,23 @@ paint (GtkWidget      *widget,
 	cairo_destroy(cr);
 }
 
+
+/**
+	keyevents for settings window
+*/
 static gboolean
 event_keypress_set (GtkWidget     *widget,
 				GdkEventKey *event )
 {
-	switch(event->keyval){
-		//co to je?
-			exit(0);
-	}
-
-	return true;
-}
-/**
- * Funkce na zpracování událostí myši
- */
-static gboolean
-event_keypress (GtkWidget     *widget,
-				GdkEventKey *event )
-{
+//	printf("debug key: %d\n",event->keyval);
 
 	switch(event->keyval){
-	// nastavení barev
-	case 'r':
-		color.b = 0.0; color.r = 1.0; color.g = 0.0;
-		break;
-	case 'b':
-		color.b = 1.0; color.r = 0.0; color.g = 0.0;
-		break;
-	case 'g':
-		color.b = 0.0; color.r = 0.0; color.g = 1.0;
-		break;
+
 	// vymazání plochy
 	case 'c':
 		{
-			cairo_t * ci = cairo_create (surface);
-			cairo_set_source_rgb (ci, 0.0,0.0,0.0);
-			cairo_paint (ci);
-			cairo_destroy (ci);
+			SavePaint();
+			CleanPaint();
 		}
 		break;
 	// spuštění režimu ve fullsreenmodu
@@ -409,11 +402,44 @@ event_keypress (GtkWidget     *widget,
 	//escape
 	case 65307:
 	case 'q':
-		exit(0);
+		gtk_main_quit ();
 		break;
 	}
+		
 
-	return TRUE;
+	return true;
+}
+
+
+/**
+	keyevents for paint windows thet is show by dataprojector
+*/
+static gboolean
+event_keypress (GtkWidget     *widget,
+				GdkEventKey *event )
+{
+
+	//printf("debug color %d %c\n", event->keyval, event->keyval);
+	switch(event->keyval){
+	// key set color for brush
+	case '1':
+	case 'r':
+		color.b = 0.0; color.r = 1.0; color.g = 0.0;
+		break;
+	case '2':
+	case 'b':
+		color.b = 1.0; color.r = 0.0; color.g = 0.0;
+		break;
+	case '3':
+	case 'g':
+		color.b = 0.0; color.r = 0.0; color.g = 1.0;
+		break;
+	case '0':
+		SavePaint();
+		CleanPaint();
+	}
+
+	return true;
 }
 
 static gboolean
@@ -453,6 +479,8 @@ resize_window (GtkWidget      *widget,
           CAIRO_CONTENT_COLOR_ALPHA,
           w, h);
 		gtk_widget_set_size_request(widget,w,h);
+		
+		CleanPaint();
 	}
 
   /* tell the canvas widget that it needs to redraw itself */
