@@ -11,7 +11,7 @@ Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
 
-int TIMER = 200;
+int TIMER = 150;
 
 double timer[3];
 
@@ -24,7 +24,7 @@ MousePosition finger = {0,0,0,0,.0,.0};
 int window_w, window_h;
 IplImage* cv_image;
 
-int treshold = 120;
+int treshold = 180;
 
 gboolean timeout2(gpointer data){
 	if(!start) return true;
@@ -122,7 +122,7 @@ main (gint    argc,
                    );
 
   g_signal_connect (G_OBJECT (settings), "key-press-event",
-                      G_CALLBACK (event_keypress_set),
+                      G_CALLBACK (event_keypress),
                       NULL
                      );
 
@@ -267,11 +267,11 @@ static void video (
 
 	gtk_widget_queue_draw(GTK_WIDGET(widget));
 
-	//double t =  Microtime();
-
 	if(!start) return;
 
-	if(cv_image){
+	if(cv_image!=NULL){
+
+		double t =  Microtime();
 
 		/* vypsání ladícího textu */
 		CvFont font;
@@ -306,11 +306,11 @@ static void video (
 						 0, 0, 0, 0, 640, 480, GDK_RGB_DITHER_NONE, 0, 0 );
 		gtk_widget_queue_draw(widget);
 		gdk_pixbuf_unref (pix);
+		
+		timer[2] =  Microtime() - t;
 	} else {
-		printf("ERROR: Video nebylo načteno.\n");
+		//printf("ERROR: Video nebylo načteno.\n");
 	}
-
-	//timer[2] =  Microtime() - t;
 }
 
 void SavePaint(){
@@ -369,6 +369,42 @@ event_keypress_set (GtkWidget     *widget,
 
 	switch(event->keyval){
 
+//
+	}
+		
+
+	return TRUE;
+}
+
+
+/**
+	keyevents for paint windows thet is show by dataprojector
+*/
+static gboolean
+event_keypress (GtkWidget     *widget,
+				GdkEventKey *event )
+{
+
+	//printf("debug color %d %c\n", event->keyval, event->keyval);
+	switch(event->keyval){
+	// key set color for brush
+	case '1':
+	case 'r':
+		color.b = 0.0; color.r = 1.0; color.g = 0.0;
+		break;
+	case '2':
+	case 'b':
+		color.b = 1.0; color.r = 0.0; color.g = 0.0;
+		break;
+	case '3':
+	case 'g':
+		color.b = 0.0; color.r = 0.0; color.g = 1.0;
+		break;
+	case '0':
+		SavePaint();
+		CleanPaint();
+		break;
+
 	// vymazání plochy
 	case 'c':
 		{
@@ -405,39 +441,6 @@ event_keypress_set (GtkWidget     *widget,
 		gtk_main_quit ();
 		break;
 	}
-		
-
-	return true;
-}
-
-
-/**
-	keyevents for paint windows thet is show by dataprojector
-*/
-static gboolean
-event_keypress (GtkWidget     *widget,
-				GdkEventKey *event )
-{
-
-	//printf("debug color %d %c\n", event->keyval, event->keyval);
-	switch(event->keyval){
-	// key set color for brush
-	case '1':
-	case 'r':
-		color.b = 0.0; color.r = 1.0; color.g = 0.0;
-		break;
-	case '2':
-	case 'b':
-		color.b = 1.0; color.r = 0.0; color.g = 0.0;
-		break;
-	case '3':
-	case 'g':
-		color.b = 0.0; color.r = 0.0; color.g = 1.0;
-		break;
-	case '0':
-		SavePaint();
-		CleanPaint();
-	}
 
 	return true;
 }
@@ -458,6 +461,9 @@ event_motion (GtkWidget      *widget,
   return TRUE;
 }
 
+/**
+ * windows resize funtion
+*/
 static gboolean
 resize_window (GtkWidget      *widget,
               GdkEventMotion *mev)

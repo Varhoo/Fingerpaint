@@ -88,6 +88,18 @@ IplImage*	Detection::Next(void){
 #endif
 		if(tracks.size()>0){
 			cvb::CvTracks::const_iterator it=tracks.begin();
+			cvb::CvTracks::const_iterator it2;
+
+			bold = 0;
+			//for(unsigned int i=0;i<tracks.size();i++){
+			for ( it2=tracks.begin() ; it2 != tracks.end(); it2++ ) {
+				//printf("%d\n",i);
+				int _bold= (it2->second->maxx-it2->second->minx)*(it2->second->maxy-it2->second->miny);
+				if (_bold > bold) {
+					bold = _bold;
+					it = it2;
+				}
+			}
 #ifdef DEBUG
 			printf("%d: (%f %f) %d\n",
 					it->second->id,
