@@ -11,7 +11,7 @@ Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
 
-int TIMER = 150;
+int TIMER = 130;
 
 double timer[3];
 
@@ -398,14 +398,41 @@ event_keypress (GtkWidget     *widget,
 		break;
 	case '3':
 	case 'g':
-		color.b = 0.0; color.r = 0.0; color.g = 1.0;
+		color.b = 0.2; color.r = 0.2; color.g = 1.0;
 		break;
-	case '0':
+	case 65457:
+		color.b = 1.0; color.r = 1.0; color.g = 1.0;
+		break;
+	case 65458:
+		color.b = 1.0; color.r = 0.5; color.g = 0.5;
+		break;
+	case 65459:
+		color.b = 1.0; color.r = 0.2; color.g = 0.2;
+		break;
+	case 65460:
+		color.b = 1.0; color.r = 1.0; color.g = 0.2;
+		break;
+	case 65461:
+		color.b = .1; color.r = 1.; color.g = .1;
+		break;
+	case 65462:
+		color.b = .5; color.r = .5; color.g = .0;
+		break;
+	case 65463:
+		color.b = .1; color.r = 1.0; color.g = 0.25;
+		break;
+	case 65464:
+		color.b = .1; color.r = 1.0; color.g = 1.0;
+		break;
+	case 65465:
+		color.b = .1; color.r = .1; color.g = 1.0;
+		break;
+	case 65535:
 		SavePaint();
 		CleanPaint();
 		break;
 
-	// vymazání plochy
+	// vymazání plochy0
 	case 'c':
 		{
 			SavePaint();
