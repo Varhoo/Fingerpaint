@@ -39,6 +39,7 @@ public:
 	void SetMouseRang(float *x, float *y , int *bold);
 	IplImage* DebugImage(void);
 	void SetTreshold(int treshold);
+   IplImage* getFrame(void);
 };
 
 #endif /* DETECTION_CLASS_H_ */

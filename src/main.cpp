@@ -11,7 +11,10 @@ Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
 
-int TIMER = 130;
+int TIMER = 50;
+
+static int currently_drawing = 0;
+static int currently_framing = 0;
 
 double timer[3];
 
@@ -27,21 +30,30 @@ IplImage* cv_image;
 
 int treshold = 180;
 
+static int fps = 0, __fps = 0, fpstime;
+
 gboolean timeout2(gpointer data){
 	if(!start) return true;
 
 	Detection * detec = ((TimerAction *) data)->det;
 
 	cv_image = detec->DebugImage();
-	//GtkWidget* widget = ((TimerAction *) data)->canvas_set;
+	GtkWidget* widget = ((TimerAction *) data)->canvas_set;
+
+   gtk_widget_queue_draw (widget);
 
 	return true;
 }
 
 gboolean timeout(gpointer data){
-	if(!start) return true;
+	if(!start or currently_framing ) return true;
 
 	double t = Microtime();	
+	currently_framing = 1;
+
+	__fps++;
+
+	if(time(NULL)-fpstime > 0) {  fps = __fps;  __fps = 0; fpstime=time(NULL);}
 
 	Detection * detec = ((TimerAction *) data)->det;
 	MousePosition * finger = ((TimerAction *) data)->fin;
@@ -61,6 +73,7 @@ gboolean timeout(gpointer data){
 	gtk_widget_queue_draw (canvas);
 
 	timer[0] =  Microtime() - t;
+	
 	return true;
 }
 
@@ -292,7 +305,7 @@ static void video (
 		GtkWidget      *widget,
 		GdkEventExpose *eev){
 
-	gtk_widget_queue_draw(GTK_WIDGET(widget));
+	//gtk_widget_queue_draw(GTK_WIDGET(widget));
 
 	if(!start) return;
 
@@ -312,7 +325,7 @@ static void video (
 		cvPutText (cv_image,buffer,cvPoint(10,20), &font, cvScalar(0,255,0));
 		cvLine(cv_image,cvPoint(260,15),cvPoint(260+treshold,15),cvScalar(0,255,0),10,4);
 
-		sprintf(buffer,"T1: %f | %f | %f",timer[0],timer[1],timer[2]);
+		sprintf(buffer,"T1: %f | %f | %d fps",timer[0],timer[1],fps);
 		cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255,0,0));
 
 		//převedení opencv do gtk
@@ -331,13 +344,15 @@ static void video (
 						 widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
 						 pix,
 						 0, 0, 0, 0, 640, 480, GDK_RGB_DITHER_NONE, 0, 0 );
-		gtk_widget_queue_draw(widget);
+		//gtk_widget_queue_draw(widget);
 		gdk_pixbuf_unref (pix);
 		
 		timer[2] =  Microtime() - t;
 	} else {
 		//printf("ERROR: Video nebylo načteno.\n");
 	}
+
+	currently_framing = 0;
 }
 
 void SavePaint(){

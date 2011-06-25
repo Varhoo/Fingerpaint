@@ -164,6 +164,11 @@ IplImage* Detection::DebugImage(void){
 	return paint;
 }
 
+IplImage* Detection::getFrame(void){
+   cvCvtColor( frame, frame, CV_RGB2BGR );
+	return frame;
+}
+
 void Detection::SetMouseRang(float *x, float *y, int *bold ){
 	*x = mouse.x/float(width);
 	*y = mouse.y/float(height);
