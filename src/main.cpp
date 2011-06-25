@@ -19,6 +19,7 @@ cairo_surface_t * surface;
 cairo_surface_t * image;
 //cairo_t *ci;
 bool isFullSreen = 0;
+bool paint_circle = false;
 MousePosition finger = {0,0,0,0,.0,.0};
 
 int window_w, window_h;
@@ -231,30 +232,56 @@ paint_selection (cairo_t       *ci,
 	float test_t = sqrt(pow(mouse->x-mouse->prev_x,2)+
 	pow(mouse->y-mouse->prev_y,2));
 
+	int size_brush;
 	//omezení pokud jsou velké skoky
 	if(test_t==0 || test_t > 100) return;
 
-	int size_brush = 5+mouse->bold;
-	int step = int (test_t/size_brush);
+	cairo_save (ci);
 
+if(paint_circle){
+	size_brush = 5+mouse->bold/15;
+	cairo_set_line_width (ci, 0.);
+} else {
+	size_brush = 5+mouse->bold*0.75;
+}
+	int step = int (test_t/size_brush);
+	int rate_rand = 10;
+//printf("%d %d\n",size_brush, mouse->bold);
 	//délka jednoho tahu
 	double step_x = (mouse->x - mouse->prev_x)/(double) step;
 	double step_y = (mouse->y - mouse->prev_y)/(double) step;
 	
-	cairo_save (ci);
 	  /* proložení ploch */
 	  for(int i=0; i < step+1; i++){
+if(!paint_circle){
 		 cairo_set_source_rgba (ci, color.r, color.g, color.b, 1.);
 		 cairo_arc (ci, mouse->prev_x+step_x*i,mouse->prev_y+step_y*i,  size_brush, 0, 2 * M_PI);
 		 cairo_fill_preserve (ci);
 		 cairo_stroke (ci);
+} else {
+	  cairo_set_source_rgba (ci, color.r, color.g, color.b, 0.2);
+	  for(int j=0; j < 5; j++){
+//		printf("%f ",10*(drand48()*2.-1.));
+		cairo_arc (ci, (mouse->prev_x+step_x*i)+rate_rand*(drand48()*2.-1.), (mouse->prev_y+step_y*i)+rate_rand*(drand48()*2.-1.),  size_brush, 0, 2 * M_PI);
+		cairo_fill_preserve (ci);
+		cairo_stroke (ci);
+	  }
+}
 	  }
 	  //vykreslení plochy
+if(!paint_circle){
 	  cairo_set_source_rgba (ci, color.r, color.g, color.b, 1.);
 	  cairo_arc (ci, mouse->x, mouse->y,  size_brush, 0, 2 * M_PI);
 	  cairo_fill_preserve (ci);
 	  cairo_stroke (ci);
-
+} else {
+	  for(int j=0; j < 5; j++){
+//		printf("%f ",10*(drand48()*2.-1.));
+		cairo_arc (ci, mouse->x+rate_rand*(drand48()*2.-1.), mouse->y+rate_rand*(drand48()*2.-1.),  size_brush/5, 0, 2 * M_PI);
+		cairo_fill_preserve (ci);
+		cairo_stroke (ci);
+	  }
+}
 	  cairo_restore (ci);
 
 	  timer[1] =  Microtime() - t;
