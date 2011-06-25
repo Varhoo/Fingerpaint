@@ -3,22 +3,25 @@
 
 GXX=g++
 LIBS= -lm #-lX11 -lXi -lXmu -lglut -lGL -lGLU
-CFLAGS= -Wall -g -o2
-CFLAGS  += `pkg-config gtk+-2.0 --cflags`
-LIBS += `pkg-config --cflags --libs gtk+-2.0 gmodule-export-2.0` #`pkg-config gtk+-2.0 --libs`
+CFLAGS= -Wall -g -O3
+CFLAGS+= `pkg-config gtk+-2.0 --cflags gtkglext-1.0 gtkglext-x11-1.0`
+LIBS+= `pkg-config --cflags --libs gtk+-2.0 gmodule-export-2.0 --libs gthread-2.0 gtkglext-1.0 gtkglext-x11-1.0`
 
 CVCFLAGS  += $(CFLAGS) `pkg-config opencv --cflags`
 CVLIBS += -I ./lib/h/ `pkg-config opencv --libs`
 
 PROGRAM= fingerpaint
 
-all: cvblob $(PROGRAM) detec
+all: cvblob $(PROGRAM) detec $(PROGRAM)_gui
 	
 $(PROGRAM): main.o detection_class.o ./lib/libcvblob.a
 #compitle aplication
 	$(CXX) $(LIBS) $(CFLAGS) $(CVCFLAGS) $(CVLIBS) $^ -o $@
 #create dir for saving image
 	@mkdir -p paints
+
+$(PROGRAM)_gui: gui.o detection_class.o ./lib/libcvblob.a
+	$(CXX) $(LIBS) $(CFLAGS) $(CVCFLAGS) $(CVLIBS) $^ -o $@
 
 detec: detec.o detection_class.o ./lib/libcvblob.a
 	$(CXX) $(CVCFLAGS) $(CVLIBS) $^ -o $@
@@ -34,8 +37,8 @@ cvblob:
 	@echo "-----------------------"
 	cp lib/cvblob/cvBlob/*.h lib/h/
 
-testgui: gui.cpp
-	$(CXX) $(CFLAGS) $(LIBS) $^ -o $@
+gui.o:  src/gui.cpp
+	$(CXX) $(CFLAGS) $(LIBS) $(CVCFLAGS) $(CVLIBS) -c $^ -o $@
 
 #objects
 main.o: src/main.cpp
