@@ -18,20 +18,29 @@
 //
 
 #include <climits>
+
+#define _USE_MATH_DEFINES
 #include <cmath>
+
 #include <deque>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 using namespace std;
 
-#ifdef WIN32
+#if (defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || (defined(__APPLE__) & defined(__MACH__)))
 #include <cv.h>
 #else
 #include <opencv/cv.h>
 #endif
 
 #include "cvblob.h"
+
+#ifdef M_PI
+const double pi = M_PI;
+#else
+const double pi = std::atan(1.)*4.;
+#endif // M_PI
 
 namespace cvb
 {
@@ -86,24 +95,27 @@ namespace cvb
       unsigned int y = cc->startingPoint.y;
       contour->push_back(cvPoint(x, y));
 
-      CvChainCodes::const_iterator it=cc->chainCode.begin();
-      CvChainCode lastCode = *it;
-
-      x += cvChainCodeMoves[*it][0];
-      y += cvChainCodeMoves[*it][1];
-
-      ++it;
-
-      for (; it!=cc->chainCode.end(); ++it)
+      if (cc->chainCode.size())
       {
-	if (lastCode!=*it)
-	{
-	  contour->push_back(cvPoint(x, y));
-	  lastCode=*it;
-	}
+        CvChainCodes::const_iterator it=cc->chainCode.begin();
+        CvChainCode lastCode = *it;
 
-	x += cvChainCodeMoves[*it][0];
-	y += cvChainCodeMoves[*it][1];
+        x += cvChainCodeMoves[*it][0];
+        y += cvChainCodeMoves[*it][1];
+
+        ++it;
+
+        for (; it!=cc->chainCode.end(); ++it)
+        {
+          if (lastCode!=*it)
+          {
+            contour->push_back(cvPoint(x, y));
+            lastCode=*it;
+          }
+
+          x += cvChainCodeMoves[*it][0];
+          y += cvChainCodeMoves[*it][1];
+        }
       }
 
       return contour;
@@ -200,6 +212,24 @@ namespace cvb
 	perimeter+=cvDistancePointPoint((*p)[i], (*p)[i+1]);
 
       return perimeter;
+    }
+    __CV_END__;
+  }
+
+  double cvContourPolygonCircularity(const CvContourPolygon *p)
+  {
+    CV_FUNCNAME("cvContourPolygonCircularity");
+    __CV_BEGIN__;
+    {
+      CV_ASSERT(p!=NULL);
+
+      double l = cvContourPolygonPerimeter(p);
+      double c = (l*l/cvContourPolygonArea(p)) - 4.*pi;
+
+      if (c>=0.)
+        return c;
+      else // This could happen if the blob it's only a pixel: the perimeter will be 0. Another solution would be to force "cvContourPolygonPerimeter" to be 1 or greater.
+        return 0.;
     }
     __CV_END__;
   }

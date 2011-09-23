@@ -36,7 +36,7 @@
 #include <vector>
 #include <limits>
 
-#ifdef WIN32
+#if (defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || (defined(__APPLE__) & defined(__MACH__)))
 #include <cv.h>
 #else
 #include <opencv/cv.h>
@@ -161,6 +161,12 @@ extern "C" {
   /// \return Perimeter of the contour.
   double cvContourPolygonPerimeter(CvContourPolygon const *p);
 
+  /// \fn double cvContourPolygonCircularity(const CvContourPolygon *p)
+  /// \brief Calculates the circularity of a polygon (compactness measure).
+  /// \param p Contour (polygon type).
+  /// \return Circularity: a non-negative value, where 0 correspond with a circumference.
+  double cvContourPolygonCircularity(const CvContourPolygon *p);
+
   /// \fn CvContourPolygon *cvSimplifyPolygon(CvContourPolygon const *p, double const delta=1.)
   /// \brief Simplify a polygon reducing the number of vertex according the distance "delta".
   /// Uses a version of the Ramer-Douglas-Peucker algorithm (http://en.wikipedia.org/wiki/Ramer-Douglas-Peucker_algorithm).
@@ -235,10 +241,16 @@ extern "C" {
     double m20; ///< Moment 20.
     double m02; ///< Moment 02.
     
-    bool centralMoments; ///< True if central moments are being calculated.
     double u11; ///< Central moment 11.
     double u20; ///< Central moment 20.
     double u02; ///< Central moment 02.
+
+    double n11; ///< Normalized central moment 11.
+    double n20; ///< Normalized central moment 20.
+    double n02; ///< Normalized central moment 02.
+
+    double p1; ///< Hu moment 1.
+    double p2; ///< Hu moment 2.
 
     CvContourChainCode contour;           ///< Contour.
     CvContoursChainCode internalContours; ///< Internal contours.
@@ -351,21 +363,10 @@ extern "C" {
     return blob->centroid=cvPoint2D64f(blob->m10/blob->area, blob->m01/blob->area);
   }
 
-  /// \fn void cvCentralMoments(CvBlob *blob, const IplImage *img)
-  /// \brief Calculates central moment for a blob.
-  /// Central moments will be stored in blob structure.
-  /// \param blob Blob.
-  /// \param img Label image (depth=IPL_DEPTH_LABEL and num. channels=1).
-  /// \see CvBlob
-  /// \see cvLabel
-  void cvCentralMoments(CvBlob *blob, const IplImage *img);
-
   /// \fn double cvAngle(CvBlob *blob)
   /// \brief Calculates angle orientation of a blob.
-  /// This function uses central moments so cvCentralMoments should have been called before for this blob.
   /// \param blob Blob.
   /// \return Angle orientation in radians.
-  /// \see cvCentralMoments
   /// \see CvBlob
   double cvAngle(CvBlob *blob);
 

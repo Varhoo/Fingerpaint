@@ -1,8 +1,9 @@
 /*
  * main.h
  *
- *  Created on: 26.11.2010
- *      Author: pavel
+ *  Created on: 27.11.2010
+ *      author: Pavel Studeník
+ *      email: studenik@varhoo.cz
  */
 
 #ifndef MAIN_H_
@@ -13,26 +14,14 @@
 #include <gtk/gtk.h>
 #include <cairo.h>
 #include <math.h>
-#include <math.h>
 #include <cv.h>
 #include <highgui.h>
 #include <string>
 
-#include "detection_class.h"
+#include "detection_webcam.h"
 
 #define DEFAULT_WIDTH  800
 #define DEFAULT_HEIGHT 640
-
-#include  <sys/time.h>
-#include  <time.h>
-#include <stdlib.h>
-
-double Microtime(){
-     timeval tim;
-     gettimeofday(&tim, NULL);
-     return (tim.tv_sec+(tim.tv_usec/1000000.0));
-}
-
 
 /* a structure keeping information about
  * the selection */
@@ -98,10 +87,6 @@ static gboolean
 static gboolean 
 	event_keypress (GtkWidget     *widget,
 					GdkEventKey *event );
-
-static gboolean
-	event_keypress_set	(GtkWidget     *widget,
-						GdkEventKey *event );
 
 static gboolean
 	resize_window (GtkWidget      *widget,

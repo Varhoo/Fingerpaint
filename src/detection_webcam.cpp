@@ -2,73 +2,89 @@
  * detection_class.cpp
  *
  *  Created on: 27.11.2010
- *      Author: Pavel Studeník
+ *      author: Pavel Studeník
+ *      email: studenik@varhoo.cz
  */
 
-#include "detection_class.h"
+#include "detection_webcam.h"
 
 Detection::Detection(CvCapture * capture_tmp){
-
+        //bakcup caputure of video
 		capture = capture_tmp;
 
-		if(!cvGrabFrame(capture)){              // capture a frame
-		  printf("Could not grab a frame\n\7");
+		if(!cvGrabFrame(capture)){              
+          // capture a frame
+		  printf("FAIL: Could not grab a frame\n");
 		}
 
+        //get information about video
 	    height    = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
 	    width    = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
 	    fps       = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
 
+        //get frame from video capture
 	    frame = cvQueryFrame(capture);
 
+        //sometime cature don't set infomration
+        //get information from frame
 	    if(!(width>0 && height>0)){
 	    	width = frame->width;
 	    	height = frame->height;
 	    	printf("SET: size camera: %d %d\n", width, height);
 	    }
-
+        //set fps - manualy
 	    if(!(fps>0)){
-	    	fps = 20;
+	    	fps = DEFAULT_FPS;
 	    	printf("SET: psf camera: %d\n", fps);
 	    }
 
 		storage= cvCreateMemStorage();
 
+        //temporary image
 		g_gray = cvCreateImage( cvGetSize( frame ), 8, 1 );
 		paint = cvCreateImage( cvGetSize( frame ), 8, 3 );
 		tmp = cvCreateImage( cvGetSize( frame ), 8, 1 );
 
 		contours = 0;
-		g_thresh = 150;
-
+		g_thresh = 150; //default trashold
 
 	}
 
+/**
+ * Set value for trashold
+ */
 void Detection::SetTreshold(int treshold){
 	g_thresh = treshold;
 }
 
+/**
+ * Move to next frame
+ * @return - actual frame
+ */
 IplImage*	Detection::Next(void){
 
 		frame = cvQueryFrame( capture );
 
 		cvb::CvTracks tracks;
 
-		/* horizontální transformace pomocí vertikální a otočení o 180 */
+        // rotate frame thanks mirror and degree transformation
 		//Rotate(frame,180, true);
 
 		cvCvtColor( frame, g_gray, CV_BGR2GRAY );
 
+        timer = Microtime();
 		cvThreshold( g_gray, tmp, g_thresh, 255, CV_THRESH_BINARY );
+        timer = Microtime() - timer;
 
-		//cvErode(tmp,g_gray,NULL,5);
-		//cvDilate(g_gray,tmp,NULL,7);
-
-		cvDilate(tmp,g_gray,NULL,5);
-		cvErode(g_gray,tmp,NULL,5);
+        //filter for better detection
+        //using dilate and erode
+		cvDilate(tmp,g_gray,NULL,filter_de);
+		cvErode(g_gray,tmp,NULL,filter_de);
 		
 		cvCopy(tmp,g_gray);
 
+        //detection
+        //using blob - external library
 		cvb::CvBlobs blobs;
 		int bold = 0;
 
@@ -78,7 +94,8 @@ IplImage*	Detection::Next(void){
 
 		cvCvtColor( g_gray, paint, CV_GRAY2BGR );
 
-		cvb::cvFilterByArea(blobs, 100, 1000000);
+        //basic value 100, 100000
+		cvb::cvFilterByArea(blobs, filter_min_af, filter_max_af);
 		cvb::cvUpdateTracks(blobs, tracks, 200., 5);
 		cvb::cvRenderTracks(tracks, paint, paint, CV_TRACK_RENDER_ID|CV_TRACK_RENDER_BOUNDING_BOX);
 
@@ -160,15 +177,44 @@ IplImage * Detection::Rotate(IplImage * frame, int angle, bool mirror){
     return frame;
 }
 
-IplImage* Detection::DebugImage(void){
+void 
+Detection::SetParameter(
+    int max_arrea_filter, int min_arrea_filter, int dilate_erode){
+
+    this->filter_max_af = max_arrea_filter;
+    this->filter_min_af = min_arrea_filter;
+    this->filter_de = dilate_erode;
+}
+
+IplImage* 
+Detection::DebugImage(
+    void){
+
 	return paint;
 }
 
-IplImage* Detection::getFrame(void){
-   cvCvtColor( frame, frame, CV_RGB2BGR );
-	return frame;
+double
+Detection::GetTimer(
+    void){
+
+    return timer;
 }
 
+/**
+ * Get frame and convert it
+ */
+IplImage* 
+Detection::GetFrame(
+    void){
+
+    //convert data RGB -> BRG due to gtk canvas 
+    cvCvtColor( frame, frame, CV_RGB2BGR );
+    return frame;
+}
+
+/**
+ * Set data for mouse/brush
+ */
 void Detection::SetMouseRang(float *x, float *y, int *bold ){
 	*x = mouse.x/float(width);
 	*y = mouse.y/float(height);

@@ -21,7 +21,7 @@
 #include <iostream>
 using namespace std;
 
-#ifdef WIN32
+#if (defined(_WIN32) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__) || (defined(__APPLE__) & defined(__MACH__)))
 #include <cv.h>
 #else
 #include <opencv/cv.h>
@@ -86,8 +86,8 @@ namespace cvb
 #define imageIn(X, Y) imgDataIn[(X) + (Y)*stepIn]
 #define imageOut(X, Y) imgDataOut[(X) + (Y)*stepOut]
 
-      //CvLabel lastLabel =0;
-      //CvBlob *lastBlob = NULL;
+      CvLabel lastLabel = 0;
+      CvBlob *lastBlob = NULL;
 
       for (unsigned int y=0; y<imgIn_height; y++)
       {
@@ -102,7 +102,6 @@ namespace cvb
 	      labeled = true;
 
 	      // Label contour.
-	      //lastLabel = label;
 	      label++;
 	      CV_ASSERT(label!=CV_BLOB_MAX_LABEL);
 
@@ -114,7 +113,6 @@ namespace cvb
 		imageOut(x, y-1) = CV_BLOB_MAX_LABEL;
 
 	      CvBlob *blob = new CvBlob;
-	      //lastBlob = blob;
 	      blob->label = label;
 	      blob->area = 1;
 	      blob->minx = x; blob->maxx = x;
@@ -122,9 +120,11 @@ namespace cvb
 	      blob->m10=x; blob->m01=y;
 	      blob->m11=x*y;
 	      blob->m20=x*x; blob->m02=y*y;
-	      blob->centralMoments=false;
 	      blob->internalContours.clear();
 	      blobs.insert(CvLabelBlob(label,blob));
+
+              lastLabel = label;
+	      lastBlob = blob;
 
 	      blob->contour.startingPoint = cvPoint(x, y);
 
@@ -170,18 +170,21 @@ namespace cvb
 		    direction=(direction+1)%4;
 		  else
 		  {
-		    imageOut(xx, yy) = label;
-		    numPixels++;
+		    if (imageOut(xx, yy) != label)
+		    {
+		      imageOut(xx, yy) = label;
+		      numPixels++;
 
-		    if (xx<blob->minx) blob->minx = xx;
-		    else if (xx>blob->maxx) blob->maxx = xx;
-		    if (yy<blob->miny) blob->miny = yy;
-		    else if (yy>blob->maxy) blob->maxy = yy;
+		      if (xx<blob->minx) blob->minx = xx;
+		      else if (xx>blob->maxx) blob->maxx = xx;
+		      if (yy<blob->miny) blob->miny = yy;
+		      else if (yy>blob->maxy) blob->maxy = yy;
 
-		    blob->area++;
-		    blob->m10+=xx; blob->m01+=yy;
-		    blob->m11+=xx*yy;
-		    blob->m20+=xx*xx; blob->m02+=yy*yy;
+		      blob->area++;
+		      blob->m10+=xx; blob->m01+=yy;
+		      blob->m11+=xx*yy;
+		      blob->m20+=xx*xx; blob->m02+=yy*yy;
+		    }
 
 		    break;
 		  }
@@ -204,18 +207,25 @@ namespace cvb
 
 	      if (!imageOut(x, y))
 	      {
-		if (!imageOut(x-1, y))
+		/*if (!imageOut(x-1, y))
 		{
 		  cerr << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		  continue;
-		}
+		}*/
 
 		l = imageOut(x-1, y);
 
 		imageOut(x, y) = l;
 		numPixels++;
 
-		blob = blobs.find(l)->second;
+                if (l==lastLabel)
+                  blob = lastBlob;
+                else
+                {
+                  blob = blobs.find(l)->second;
+                  lastLabel = l;
+                  lastBlob = blob;
+                }
 		blob->area++;
 		blob->m10+=x; blob->m01+=y;
 		blob->m11+=x*y;
@@ -224,7 +234,15 @@ namespace cvb
 	      else
 	      {
 		l = imageOut(x, y);
-		blob = blobs.find(l)->second;
+
+                if (l==lastLabel)
+                  blob = lastBlob;
+                else
+                {
+                  blob = blobs.find(l)->second;
+                  lastLabel = l;
+                  lastBlob = blob;
+                }
 	      }
 
 	      // XXX This is not necessary (I believe). I only do this for consistency.
@@ -233,7 +251,7 @@ namespace cvb
 	      CvContourChainCode *contour = new CvContourChainCode;
 	      contour->startingPoint = cvPoint(x, y);
 
-	      unsigned char direction=3;
+	      unsigned char direction = 3;
 	      unsigned int xx = x;
 	      unsigned int yy = y;
 
@@ -298,7 +316,15 @@ namespace cvb
 	      imageOut(x, y) = l;
 	      numPixels++;
 
-	      CvBlob *blob = blobs.find(l)->second;
+	      CvBlob *blob = NULL;
+              if (l==lastLabel)
+                blob = lastBlob;
+              else
+              {
+                blob = blobs.find(l)->second;
+                lastLabel = l;
+                lastBlob = blob;
+              }
 	      blob->area++;
 	      blob->m10+=x; blob->m01+=y;
 	      blob->m11+=x*y;
@@ -308,9 +334,25 @@ namespace cvb
 	}
       }
 
-      // XXX Here?
       for (CvBlobs::iterator it=blobs.begin(); it!=blobs.end(); ++it)
+      {
 	cvCentroid((*it).second);
+
+        (*it).second->u11 = (*it).second->m11 - ((*it).second->m10*(*it).second->m01)/(*it).second->m00;
+        (*it).second->u20 = (*it).second->m20 - ((*it).second->m10*(*it).second->m10)/(*it).second->m00;
+        (*it).second->u02 = (*it).second->m02 - ((*it).second->m01*(*it).second->m01)/(*it).second->m00;
+
+        double m00_2 = (*it).second->m00 * (*it).second->m00;
+
+        (*it).second->n11 = (*it).second->u11 / m00_2;
+        (*it).second->n20 = (*it).second->u20 / m00_2;
+        (*it).second->n02 = (*it).second->u02 / m00_2;
+
+        (*it).second->p1 = (*it).second->n20 + (*it).second->n02;
+
+        double nn = (*it).second->n20 - (*it).second->n02;
+        (*it).second->p2 = nn*nn + 4.*((*it).second->n11*(*it).second->n11);
+      }
 
       return numPixels;
 

@@ -1,8 +1,9 @@
 /*
  * main.cpp
  *
- *  Created on: 26.11.2010
- *      Author: Pavel Studeník, Bc.
+ *  Created on: 27.11.2010
+ *      author: Pavel Studeník
+ *      email: studenik@varhoo.cz
  */
 
 #include "main.h"
@@ -10,13 +11,12 @@
 Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
-
 int TIMER = 50;
 
-static int currently_drawing = 0;
+//static int currently_drawing = 0;
 static int currently_framing = 0;
 
-double timer[3];
+double timer[4];
 
 cairo_surface_t * surface;
 cairo_surface_t * image;
@@ -25,11 +25,9 @@ bool isFullSreen = 0;
 bool paint_circle = false;
 MousePosition finger = {0,0,0,0,.0,.0};
 
-int window_w, window_h;
-IplImage* cv_image;
-
-int treshold = 180;
-
+static int window_w, window_h;
+static IplImage* cv_image;
+static int treshold = 180;
 static int fps = 0, __fps = 0, fpstime;
 
 gboolean timeout2(gpointer data){
@@ -48,20 +46,29 @@ gboolean timeout2(gpointer data){
 gboolean timeout(gpointer data){
 	if(!start or currently_framing ) return true;
 
+    //time debug
 	double t = Microtime();	
+
+    //lock process
 	currently_framing = 1;
 
+    //fps counter for debug
 	__fps++;
 
 	if(time(NULL)-fpstime > 0) {  fps = __fps;  __fps = 0; fpstime=time(NULL);}
 
+    // get value from universe structur
 	Detection * detec = ((TimerAction *) data)->det;
 	MousePosition * finger = ((TimerAction *) data)->fin;
 	GtkWidget     *canvas = ((TimerAction *) data)->canvas;
 
+    //set trashold value
 	detec->SetTreshold(treshold);
 
+	timer[2] =  Microtime();
 	detec->Next();
+	timer[2] =  Microtime()-timer[2];
+	timer[3] =  detec->GetTimer();
 
 	detec->SetMouseRang(&(finger->f_x),&(finger->f_y),&(finger->bold));
 
@@ -164,17 +171,18 @@ main (gint    argc,
                     &mouse
                   );
 
-  image = cairo_image_surface_create_from_png ("data/brush.png");
+  //image = cairo_image_surface_create_from_png ("data/brush.png");
 
   gtk_container_add (GTK_CONTAINER (window), canvas);
-
   gtk_container_add (GTK_CONTAINER (settings), canvas_settings);
 
-  //CvCapture * capture = cvCaptureFromAVI("data/video2.avi");
-  CvCapture * capture = cvCaptureFromCAM(device);
-  Detection * detec = new Detection(capture);
+  CvCapture * video_capture = cvCaptureFromCAM(device);
+  Detection * Detect = new Detection(video_capture);
+  //Set parametr for detection
+  //max area size, min area size, delate/erode filter
+  Detect->SetParameter(100000,100,5);         
 
-  TimerAction timer_action = { detec, &mouse, canvas, canvas_settings};
+  TimerAction timer_action = { Detect, &mouse, canvas, canvas_settings};
 
   gtk_widget_show (canvas_settings);
 
@@ -300,7 +308,7 @@ if(!paint_circle){
 	  timer[1] =  Microtime() - t;
 }
 
-/* funkce která vykesluje */
+/* draw to video canvas */
 static void video (
 		GtkWidget      *widget,
 		GdkEventExpose *eev){
@@ -325,8 +333,10 @@ static void video (
 		cvPutText (cv_image,buffer,cvPoint(10,20), &font, cvScalar(0,255,0));
 		cvLine(cv_image,cvPoint(260,15),cvPoint(260+treshold,15),cvScalar(0,255,0),10,4);
 
-		sprintf(buffer,"T1: %f | %f | %d fps",timer[0],timer[1],fps);
+		sprintf(buffer,"Timer: %f | %f | %f | %f",timer[0], timer[1], timer[2],timer[3]);
 		cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255,0,0));
+		sprintf(buffer,"Fps: %d ", fps);
+		cvPutText (cv_image,buffer,cvPoint(10,50), &font, cvScalar(255,0,0));
 
 		//převedení opencv do gtk
 		GdkPixbuf * pix = gdk_pixbuf_new_from_data(
@@ -373,13 +383,13 @@ paint (GtkWidget      *widget,
        GdkEventExpose *eev,
        MousePosition  *mouse)
 {
-	gint width, height;
+	//gint width, height;
 
 	cairo_t *cr;
 	cairo_t *ci;
 
-	width  = widget->allocation.width;
-	height = widget->allocation.height;
+	//width  = widget->allocation.width;
+	//height = widget->allocation.height;
 
 	// vykreslení kreslící plochy
 	ci = cairo_create (surface);
@@ -397,25 +407,6 @@ paint (GtkWidget      *widget,
 	cairo_mask_surface(cr, surface, 0, 0);
 
 	cairo_destroy(cr);
-}
-
-
-/**
-	keyevents for settings window
-*/
-static gboolean
-event_keypress_set (GtkWidget     *widget,
-				GdkEventKey *event )
-{
-//	printf("debug key: %d\n",event->keyval);
-
-	switch(event->keyval){
-
-//
-	}
-		
-
-	return TRUE;
 }
 
 

@@ -1,3 +1,9 @@
+/*
+ * detection.cpp
+ *
+ *  Created on: 27.11.2010
+ *      Author: Pavel Studeník
+ */
 #include <gtk/gtk.h>
 #include  <sys/time.h>
 #include  <time.h>
