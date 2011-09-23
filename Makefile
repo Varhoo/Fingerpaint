@@ -19,7 +19,7 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(OBJECTS) $(CVOBJECTS) 
 	#compitle aplication
-	$(CXX) $(CFLAGS) $(CVLIBS) $^ -o $@ 
+	$(CXX) $(CFLAGS)  $^ -o $@ $(CVLIBS)
 	#create dir for saving image
 	@mkdir -p paints
 

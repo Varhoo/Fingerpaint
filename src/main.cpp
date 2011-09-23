@@ -336,7 +336,7 @@ static void video (
 		sprintf(buffer,"Timer: %f | %f | %f | %f",timer[0], timer[1], timer[2],timer[3]);
 		cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255,0,0));
 		sprintf(buffer,"Fps: %d ", fps);
-		cvPutText (cv_image,buffer,cvPoint(10,50), &font, cvScalar(255,0,0));
+		cvPutText (cv_image,buffer,cvPoint(10,60), &font, cvScalar(255,0,0));
 
 		//převedení opencv do gtk
 		GdkPixbuf * pix = gdk_pixbuf_new_from_data(
