@@ -79,6 +79,9 @@ static void video (
 		GtkWidget      *widget,
 		GdkEventExpose *eev);
 
+static void
+preload (TimerAction timer_action);
+
 static gboolean 
 	event_motion  (GtkWidget      *widget,
                                GdkEventMotion *mev,

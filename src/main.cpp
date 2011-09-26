@@ -11,7 +11,7 @@
 Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
-int TIMER = 50;
+int TIMER = 70;
 
 //static int currently_drawing = 0;
 static int currently_framing = 0;
@@ -29,13 +29,15 @@ static int window_w, window_h;
 static IplImage* cv_image;
 static int treshold = 180;
 static int fps = 0, __fps = 0, fpstime;
+static bool show_logo_bool = true;
 
 gboolean timeout2(gpointer data){
 	if(!start) return true;
 
 	Detection * detec = ((TimerAction *) data)->det;
 
-	cv_image = detec->DebugImage();
+//	cv_image = detec->DebugImage();
+	cv_image = detec->GetFrame();
 	GtkWidget* widget = ((TimerAction *) data)->canvas_set;
 
    gtk_widget_queue_draw (widget);
@@ -171,7 +173,7 @@ main (gint    argc,
                     &mouse
                   );
 
-  //image = cairo_image_surface_create_from_png ("data/brush.png");
+  //image = cairo_image_surface_create_from_png ("data/logo.png");
 
   gtk_container_add (GTK_CONTAINER (window), canvas);
   gtk_container_add (GTK_CONTAINER (settings), canvas_settings);
@@ -189,17 +191,24 @@ main (gint    argc,
   gtk_widget_show_all (window);
   gtk_widget_show_all (settings);
 
-  /* Nastavení časovače */
-  g_timeout_add(TIMER, timeout, (gpointer) &timer_action);
-
-  g_timeout_add(TIMER, timeout2, (gpointer) &timer_action);
-  
+  preload(timer_action);
   gtk_main ();
 
   return 0;
 }
 
+static void
+preload (TimerAction timer_action) 
+{
 
+	/* show logo */
+  show_logo_bool = true;
+
+  /* loading timer */
+  g_timeout_add(TIMER, timeout, (gpointer) &timer_action);
+  g_timeout_add(TIMER, timeout2, (gpointer) &timer_action);
+
+}
 
 /* function to draw the rectangular selection
  */
