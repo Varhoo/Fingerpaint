@@ -36,8 +36,8 @@ gboolean timeout2(gpointer data){
 
 	Detection * detec = ((TimerAction *) data)->det;
 
-//	cv_image = detec->DebugImage();
-	cv_image = detec->GetFrame();
+	cv_image = detec->DebugImage();
+	//cv_image = detec->GetFrame();
 	GtkWidget* widget = ((TimerAction *) data)->canvas_set;
 
    gtk_widget_queue_draw (widget);
