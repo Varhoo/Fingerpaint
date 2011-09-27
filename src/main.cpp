@@ -23,6 +23,7 @@ cairo_surface_t * image;
 //cairo_t *ci;
 bool isFullSreen = 0;
 bool paint_circle = false;
+static int brush_type = 0;
 MousePosition finger = {0,0,0,0,.0,.0};
 
 static int window_w, window_h;
@@ -284,28 +285,34 @@ paint_selection (cairo_t       *ci,
 
 	cairo_save (ci);
 
-if(paint_circle){
-	size_brush = 5+mouse->bold/15;
-	cairo_set_line_width (ci, 0.);
-} else {
-	size_brush = 5+mouse->bold*0.75;
-}
+   if(brush_type == 0){
+		size_brush = 5+mouse->bold/15;
+		cairo_set_line_width (ci, 0.);
+	} else {
+		size_brush = 5+mouse->bold*0.75;
+	}
 	int step = int (test_t/size_brush);
 	int rate_rand = 10;
 //printf("%d %d\n",size_brush, mouse->bold);
 	//délka jednoho tahu
 	double step_x = (mouse->x - mouse->prev_x)/(double) step;
 	double step_y = (mouse->y - mouse->prev_y)/(double) step;
+
+	float aplha = 1.;
+	
+	if(brush_type == 2) {
+		aplha = 0.2;
+	}
 	
 	  /* proložení ploch */
 	  for(int i=0; i < step+1; i++){
-if(!paint_circle){
+if(brush_type == 0){
 		 cairo_set_source_rgba (ci, color.r, color.g, color.b, 1.);
 		 cairo_arc (ci, mouse->prev_x+step_x*i,mouse->prev_y+step_y*i,  size_brush, 0, 2 * M_PI);
 		 cairo_fill_preserve (ci);
 		 cairo_stroke (ci);
 } else {
-	  cairo_set_source_rgba (ci, color.r, color.g, color.b, 0.2);
+	  cairo_set_source_rgba (ci, color.r, color.g, color.b, aplha);
 	  for(int j=0; j < 5; j++){
 //		printf("%f ",10*(drand48()*2.-1.));
 		cairo_arc (ci, (mouse->prev_x+step_x*i)+rate_rand*(drand48()*2.-1.), (mouse->prev_y+step_y*i)+rate_rand*(drand48()*2.-1.),  size_brush, 0, 2 * M_PI);
@@ -315,12 +322,13 @@ if(!paint_circle){
 }
 	  }
 	  //vykreslení plochy
-if(!paint_circle){
+if(brush_type == 0){
 	  cairo_set_source_rgba (ci, color.r, color.g, color.b, 1.);
 	  cairo_arc (ci, mouse->x, mouse->y,  size_brush, 0, 2 * M_PI);
 	  cairo_fill_preserve (ci);
 	  cairo_stroke (ci);
 } else {
+	  cairo_set_source_rgba (ci, color.r, color.g, color.b, aplha);
 	  for(int j=0; j < 5; j++){
 //		printf("%f ",10*(drand48()*2.-1.));
 		cairo_arc (ci, mouse->x+rate_rand*(drand48()*2.-1.), mouse->y+rate_rand*(drand48()*2.-1.),  size_brush/5, 0, 2 * M_PI);
@@ -498,7 +506,15 @@ event_keypress (GtkWidget     *widget,
 		break;
 
 	case 65455:
-		paint_circle = !paint_circle;
+	case '/':
+		brush_type = 0;
+		break;
+	case '+':
+		brush_type = 1;
+		break;
+	case '*':
+	case 'a':
+		brush_type = 2;
 		break;
 	case 65535:
 		SavePaint();
@@ -529,10 +545,10 @@ event_keypress (GtkWidget     *widget,
 		start = true;
 	break;
 	/* nastavení treshold pro upravu obrázku */
-	case 'n':
+	case 'm':
 		if(treshold<255) treshold++; break;
 	/* nastavení treshold pro upravu obrázku */
-	case 'm':
+	case 'n':
 		if(treshold>0) treshold--; break;
 
 	//escape
