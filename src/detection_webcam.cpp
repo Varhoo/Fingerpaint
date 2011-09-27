@@ -23,10 +23,10 @@ Detection::Detection(CvCapture * capture_tmp){
 	    fps       = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
 
 		 // set parameters for camera
-		 cvSetCaptureProperty(capture,CV_CAP_PROP_EXPOSURE ,0.0 );
+		 cvSetCaptureProperty(capture,CV_CAP_PROP_EXPOSURE ,0.1 );
 		 cvSetCaptureProperty(capture,CV_CAP_PROP_BRIGHTNESS, 0.6 );
-		 cvSetCaptureProperty(capture,CV_CAP_PROP_CONTRAST  ,1.8 );
-		 cvSetCaptureProperty(capture,CV_CAP_PROP_CONVERT_RGB  ,true );
+		 cvSetCaptureProperty(capture,CV_CAP_PROP_CONTRAST  ,0.6 );
+		 cvSetCaptureProperty(capture,CV_CAP_PROP_CONVERT_RGB  ,false );
 
         //get frame from video capture
 	    frame = cvQueryFrame(capture);

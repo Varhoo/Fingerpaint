@@ -19,7 +19,7 @@ static int currently_framing = 0;
 double timer[4];
 
 cairo_surface_t * surface;
-cairo_surface_t * image;
+cairo_surface_t * image = NULL;
 //cairo_t *ci;
 bool isFullSreen = 0;
 bool paint_circle = false;
@@ -99,11 +99,16 @@ main (gint    argc,
   GtkWidget     *canvas;
   GtkWidget     *canvas_settings;
 
+  char * path_mask = NULL;
+
   //číslo zařízení
   int device = 0;
-  if(argc > 2){
-	  if(std::string(argv[1])==std::string("-cam")){
-		  device = atoi(argv[2]);
+  for(int i = 1; i <argc; i++){
+	  if(std::string(argv[i])==std::string("--cam")){
+		  device = atoi(argv[i+1]);
+	  }
+	  if(std::string(argv[i])==std::string("--mask")){
+		  path_mask = argv[i+1];
 	  }
   }
 
@@ -177,7 +182,8 @@ main (gint    argc,
                     &mouse
                   );
 
-  //image = cairo_image_surface_create_from_png ("data/logo.png");
+  if(path_mask != NULL)
+      image = cairo_image_surface_create_from_png (path_mask);
 
   gtk_container_add (GTK_CONTAINER (window), canvas);
   gtk_container_add (GTK_CONTAINER (settings), canvas_settings);
@@ -336,7 +342,21 @@ if(brush_type == 0){
 		cairo_stroke (ci);
 	  }
 }
-	  cairo_restore (ci);
+//	cairo_restore (ci);
+if(image!=NULL){
+	int _w = cairo_image_surface_get_width (image);
+	int _h = cairo_image_surface_get_height (image);
+	//cairo_surface_t* test;
+	//cairo_t *cb;
+	//test = cairo_image_surface_create( CAIRO_FORMAT_ARGB32, _w, _h );
+    //printf("%d %d\n",_w,_h);
+	//cb = cairo_create(test);
+    cairo_scale  (ci, w/(double)_w, h/(double)_h);
+    cairo_set_source_surface (ci, image, 0, 0);
+    cairo_paint(ci);
+}
+	cairo_restore (ci);
+
 
 	  timer[1] =  Microtime() - t;
 }
