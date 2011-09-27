@@ -31,6 +31,8 @@ static int treshold = 180;
 static int fps = 0, __fps = 0, fpstime;
 static bool show_logo_bool = true;
 
+char color_key[10][16];
+
 gboolean timeout2(gpointer data){
 	if(!start) return true;
 
@@ -116,7 +118,8 @@ main (gint    argc,
 
   /* signál pro konec programu */
   g_signal_connect (G_OBJECT (window), "delete-event",
-                    G_CALLBACK (gtk_main_quit), NULL);
+                    /*G_CALLBACK (gtk_main_quit), NULL);*/
+                    G_CALLBACK (main_quit), NULL);
 
   /* vytvoření kanvasu pro okno */
   canvas = gtk_drawing_area_new ();
@@ -203,6 +206,19 @@ preload (TimerAction timer_action)
 
 	/* show logo */
   show_logo_bool = true;
+
+	printf("loading...\n");
+	CvFileStorage* fs=cvOpenFileStorage("data/config.xml", 0,CV_STORAGE_READ);
+	//save color
+	char buffer[64];
+   for(int i=0; i <=10; i++) {
+		sprintf(buffer,"color_key_%d",i);
+		char * tmp = (char *) cvReadStringByName(fs, NULL, buffer);
+		memcpy(color_key[i],tmp,strlen(tmp)+1);
+		printf("read color %d: #%s\n",i,color_key[i]);
+	}
+	treshold = cvReadIntByName( fs, NULL, "treshold");
+	cvReleaseFileStorage( &fs);
 
   /* loading timer */
   g_timeout_add(TIMER, timeout, (gpointer) &timer_action);
@@ -426,48 +442,63 @@ static gboolean
 event_keypress (GtkWidget     *widget,
 				GdkEventKey *event )
 {
-
+	unsigned int r,g,b;
 	//printf("debug color %d %c\n", event->keyval, event->keyval);
 	switch(event->keyval){
 	// key set color for brush
-	case '1':
-	case 'r':
-		color.b = 0.0; color.r = 1.0; color.g = 0.0;
-		break;
-	case '2':
-	case 'b':
-		color.b = 1.0; color.r = 0.0; color.g = 0.0;
-		break;
-	case '3':
-	case 'g':
-		color.b = 0.2; color.r = 0.2; color.g = 1.0;
+	case '65456':
+	case '0':
+		sscanf(color_key[0],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65457:
-		color.b = 1.0; color.r = 1.0; color.g = 1.0;
+	case '1':
+		sscanf(color_key[1],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65458:
-		color.b = 1.0; color.r = 0.5; color.g = 0.5;
+	case '2':
+		sscanf(color_key[2],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g =  g/255.0;
 		break;
 	case 65459:
-		color.b = 1.0; color.r = 0.2; color.g = 0.2;
+	case '3':
+		sscanf(color_key[3],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65460:
-		color.b = 1.0; color.r = 1.0; color.g = 0.2;
+	case '4':
+		sscanf(color_key[4],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65461:
-		color.b = .1; color.r = 1.; color.g = .1;
+	case '5':
+		sscanf(color_key[5],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65462:
-		color.b = .5; color.r = .5; color.g = .0;
+	case '6':
+		sscanf(color_key[6],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65463:
-		color.b = .1; color.r = 1.0; color.g = 0.25;
+	case '7':
+		sscanf(color_key[7],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65464:
-		color.b = .1; color.r = 1.0; color.g = 1.0;
+	case '8':
+		sscanf(color_key[8],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
 	case 65465:
-		color.b = .1; color.r = .1; color.g = 1.0;
+	case '9':
+		sscanf(color_key[9],"%2X%2X%2X",&r,&g,&b);
+		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
+		break;
+
+	case 65455:
+		paint_circle = !paint_circle;
 		break;
 	case 65535:
 		SavePaint();
@@ -507,7 +538,7 @@ event_keypress (GtkWidget     *widget,
 	//escape
 	case 65307:
 	case 'q':
-		gtk_main_quit ();
+		main_quit ();
 		break;
 	}
 
@@ -563,3 +594,26 @@ resize_window (GtkWidget      *widget,
   return FALSE;
 }
 
+/** function save data to xml file
+  * xml file  is in path data/config.xml
+  */
+void save_settings(void){
+	CvFileStorage* fs=cvOpenFileStorage("data/config.xml", 0,CV_STORAGE_WRITE);
+	//save color
+	char buffer[64];
+   for(int i=0; i <=10; i++) {
+		sprintf(buffer,"color_key_%d",i);
+		cvWriteString( fs, buffer, color_key[i] );
+	}
+	cvWriteInt( fs, "treshold",treshold);
+	cvReleaseFileStorage( &fs);
+}
+
+/** exit function */
+void main_quit(void){
+	printf("save config ... \t");
+	save_settings();
+	printf("[ok]\n");
+	printf("exit..\n");
+	gtk_main_quit();
+}

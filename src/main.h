@@ -96,4 +96,7 @@ static gboolean
               GdkEventMotion *mev);
 
 gboolean timeout2(gpointer data);
+
+void save_settings(void);
+void main_quit(void);
 #endif /* MAIN_H_ */
