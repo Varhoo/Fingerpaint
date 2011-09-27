@@ -11,7 +11,7 @@
 Color color = {1.0,1.0,1.0,1.0};
 
 int start = false;
-int TIMER = 70;
+int TIMER = 1000/25;
 
 //static int currently_drawing = 0;
 static int currently_framing = 0;
