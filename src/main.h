@@ -18,10 +18,13 @@
 #include <highgui.h>
 #include <string>
 
-#include "detection_webcam.h"
+//#include "detection_webcam.h"
+#include "detect.h"
+#include "utils.h"
+#include "freenect.h"
 
-#define DEFAULT_WIDTH  800
-#define DEFAULT_HEIGHT 640
+#define DEFAULT_WIDTH  640 
+#define DEFAULT_HEIGHT 480
 
 /* a structure keeping information about
  * the selection */
@@ -49,11 +52,13 @@ MousePosition;
 typedef struct
 {
 	gdouble r,g,b,a;
-}Color;
+} Color;
 
 typedef struct
 {
-	Detection * det;
+	Detect  * det;
+   freenect * frn;
+	//Detection  * det;
 	MousePosition * fin;
 	GtkWidget     *canvas;
 	GtkWidget     *canvas_set;
@@ -71,7 +76,7 @@ typedef struct
 
 static void paint (GtkWidget      *widget,
 		   GdkEventExpose *eev,
-           MousePosition  *mouse);
+           void  * d);
 
 /* forward definitions of handler for mouse events
  */

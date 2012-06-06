@@ -1,15 +1,17 @@
 <?xml version="1.0"?>
 <opencv_storage>
 <color_key_0>"000000"</color_key_0>
-<color_key_1>FF0000</color_key_1>
-<color_key_2>"0900FF"</color_key_2>
-<color_key_3>"00FF00"</color_key_3>
-<color_key_4>"000FF0"</color_key_4>
-<color_key_5>"88F888"</color_key_5>
-<color_key_6>"0F0000"</color_key_6>
-<color_key_7>F00000</color_key_7>
-<color_key_8>"000FF0"</color_key_8>
-<color_key_9>"0000FF"</color_key_9>
+<color_key_1>FFFFFF</color_key_1>
+<color_key_2>"00F6FF"</color_key_2>
+<color_key_3>"0000FF"</color_key_3>
+<color_key_4>FF67FA</color_key_4>
+<color_key_5>FF0000</color_key_5>
+<color_key_6>B70BFF</color_key_6>
+<color_key_7>FF8400</color_key_7>
+<color_key_8>FFFF00</color_key_8>
+<color_key_9>"00FF00"</color_key_9>
 <color_key_10>"00000F"</color_key_10>
-<treshold>137</treshold>
+<treshold>143</treshold>
+<filter_min>400</filter_min>
+<filter_max>550</filter_max>
 </opencv_storage>
