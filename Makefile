@@ -2,10 +2,10 @@
 # author: Pavel Studeník
 
 GXX=g++
-LIBS= -lm #-lX11 -lXi -lXmu -lglut -lGL -lGLU
+LIBS= -lm 
 CFLAGS= -Wall -g -O3
-CFLAGS+= `pkg-config gtk+-2.0 --cflags` # gtkglext-1.0 gtkglext-x11-1.0`
-LIBS+= `pkg-config --cflags --libs gtk+-2.0 gmodule-export-2.0 --libs gthread-2.0 gtkglext-1.0 gtkglext-x11-1.0`
+CFLAGS+= `pkg-config gtk+-2.0 --cflags`
+LIBS+= `pkg-config --cflags --libs gtk+-2.0 gmodule-export-2.0 --libs gthread-2.0` `
 LIBS+= `pkg-config libfreenect --libs --cflags` -lpthread -lm -lusb-1.0 -lfreenect -Wunknown-pragmas
 
 CVCFLAGS  += $(CFLAGS) `pkg-config opencv  --cflags`
