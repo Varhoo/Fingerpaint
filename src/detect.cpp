@@ -1,3 +1,9 @@
+/*
+ *  Created on: 27.11.2010
+ *      author: Pavel Studeník
+ *      email: studenik@varhoo.cz
+ */
+
 #include "detect.h"
 
 Detect::Detect(int w, int h){
@@ -7,9 +13,9 @@ Detect::Detect(int w, int h){
    g_gray = cvCreateImage( cvSize(w, h), 8, 1 );
    g_tmp = cvCreateImage( cvGetSize(g_gray), 8, 1 );
    g_mask = cvCreateImage( cvGetSize(g_gray), 8, 1 );
-   label_img = cvCreateImage(cvGetSize(g_gray), IPL_DEPTH_LABEL, 1);
-   rgb_img = cvCreateImage(cvGetSize(g_gray), IPL_DEPTH_LABEL, 3);
-   tmp_paint = cvCreateImage(cvGetSize(g_gray), IPL_DEPTH_LABEL, 3);
+   label_img = cvCreateImage( cvGetSize(g_gray), IPL_DEPTH_LABEL, 1);
+   rgb_img = cvCreateImage( cvGetSize(g_gray), IPL_DEPTH_LABEL, 3);
+   tmp_paint = cvCreateImage( cvGetSize(g_gray), IPL_DEPTH_LABEL, 3);
 
    // default value
    value_thresh = 120;
@@ -23,7 +29,7 @@ Detect::Detect(int w, int h){
 }
 
 Detect::~Detect(){
-   printf("ok\n");
+   printf("end ... ok\n");
    // free all iplImage
    /* cvReleaseImage(&g_gray);
    cvReleaseImage(&g_tmp);
@@ -36,12 +42,12 @@ void Detect::NextFrame(IplImage * depth, IplImage * rgb){
    cvCvtColor( depth, g_gray, CV_BGR2GRAY );
    cvThreshold( g_gray, g_tmp, value_thresh, 255, CV_THRESH_BINARY );
 
-   cvErode(g_tmp,g_gray,NULL,value_erode);
-   cvDilate(g_gray,g_tmp,NULL,value_dilate);
+   cvErode(g_tmp, g_gray, NULL, value_erode);
+   cvDilate(g_gray, g_tmp, NULL, value_dilate);
 
    if(is_mask_set){
       cvZero(g_gray);
-      cvCopy(g_tmp,g_gray,g_mask);
+      cvCopy(g_tmp, g_gray, g_mask);
    } else {
       cvCopy(g_tmp,g_gray);
    }

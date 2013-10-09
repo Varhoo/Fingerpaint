@@ -42,27 +42,27 @@ int freenect::filter_from = 512;
 int freenect::filter_to = 768;
 
 freenect::freenect(void){
-   // size of buffer
-   max_width = 640;
-   max_height = 480;
-   // init freenect
+    // size of buffer
+    max_width = 640;
+    max_height = 480;
+    // init freenect
 
-   // init error   
-   error = 0;
+    // init error   
+    error = 0;
 
-   // init size of depth
-	depth_mid = (uint8_t*)malloc(640*480*3);
-	depth_front = (uint8_t*)malloc(640*480*3);
-	rgb_back = (uint8_t*)malloc(640*480*3);
-	rgb_mid = (uint8_t*)malloc(640*480*3);
-	rgb_front = (uint8_t*)malloc(640*480*3);
+    // init size of depth
+    depth_mid = (uint8_t*)malloc(640*480*3);
+    depth_front = (uint8_t*)malloc(640*480*3);
+    rgb_back = (uint8_t*)malloc(640*480*3);
+    rgb_mid = (uint8_t*)malloc(640*480*3);
+    rgb_front = (uint8_t*)malloc(640*480*3);
 
 
-   frame_rgb = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
-   frame_dph = cvCreateImage(cvSize(640,480), IPL_DEPTH_8U, 3);
+    frame_rgb = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
+    frame_dph = cvCreateImage(cvSize(640, 480), IPL_DEPTH_8U, 3);
 
-   got_rgb = 0;
-   got_depth = 0;
+    got_rgb = 0;
+    got_depth = 0;
 
 	if (freenect_init(&f_ctx, NULL) < 0) {
       error = 1;

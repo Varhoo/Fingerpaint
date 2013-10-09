@@ -32,8 +32,11 @@ static IplImage* cv_image;
 static int treshold = 180;
 static int fps = 0, __fps = 0, fpstime;
 static bool show_logo_bool = true;
+static bool record_video = false;
 
 char color_key[10][16];
+CvVideoWriter * writter_v;
+char * buffer_v = (char *) "data/video.avi";
 
 gboolean timeout2(gpointer data){
 	if(!start) return true;
@@ -51,6 +54,9 @@ gboolean timeout2(gpointer data){
 
 	timer[2] =  microtime()-timer[2];
    gtk_widget_queue_draw (widget);
+
+    if (record_video)
+        cvWriteFrame(writter_v, cv_image);
 
 	return true;
 }
@@ -71,7 +77,7 @@ gboolean timeout(gpointer data){
 
     // get value from universe structur
 	timer[2] =  microtime();
-	Detect * detec = ((TimerAction *) data)->det;
+	//Detect * detec = ((TimerAction *) data)->det;
 	MousePosition * finger = ((TimerAction *) data)->fin;
 	GtkWidget     *canvas = ((TimerAction *) data)->canvas;
 
@@ -100,44 +106,46 @@ static void
 preload (TimerAction timer_action) 
 {
 
-	/* show logo */
-  show_logo_bool = true;
+    /* show logo */
+    show_logo_bool = true;
 
 	printf("loading...\n");
 	CvFileStorage* fs=cvOpenFileStorage("data/config.xml", 0,CV_STORAGE_READ);
 	//save color
 	char buffer[64];
-   for(int i=0; i <=10; i++) {
-		sprintf(buffer,"color_key_%d",i);
-		char * tmp = (char *) cvReadStringByName(fs, NULL, buffer);
-		memcpy(color_key[i],tmp,strlen(tmp)+1);
-		printf("read color %d: #%s\n",i,color_key[i]);
-	}
-	treshold = cvReadIntByName( fs, NULL, "treshold");
-	filter[0] = cvReadIntByName( fs, NULL, "filter_min");
-	filter[1] = cvReadIntByName( fs, NULL, "filter_max");
-   printf("min/max fitler %d %d\n",filter[0], filter[1]);
-	cvReleaseFileStorage( &fs );
+    for(int i=0; i <=10; i++) {
+        sprintf(buffer,"color_key_%d",i);
+        char * tmp = (char *) cvReadStringByName(fs, NULL, buffer);
+        memcpy(color_key[i],tmp,strlen(tmp)+1);
+        printf("read color %d: #%s\n",i,color_key[i]);
+    }
+    treshold = cvReadIntByName( fs, NULL, "treshold");
+    filter[0] = cvReadIntByName( fs, NULL, "filter_min");
+    filter[1] = cvReadIntByName( fs, NULL, "filter_max");
+    printf("min/max fitler %d %d\n",filter[0], filter[1]);
+    cvReleaseFileStorage( &fs );
 
-  timer_action.frn->set_filter(filter[0],filter[1]);
+    timer_action.frn->set_filter(filter[0],filter[1]);
 
-  timer_action.det->SetMask(
+    // set mask for active zone for detect
+
+    timer_action.det->SetMask(
       1,   1,
       640, 1,
       640, 480,
       1,   480
-  );
-  /* loading timer */
-  g_timeout_add(TIMER, timeout, (gpointer) &timer_action);
-  g_timeout_add(TIMER, timeout2, (gpointer) &timer_action);
+    );
+    /* loading timer */
+    g_timeout_add(TIMER, timeout, (gpointer) &timer_action);
+    g_timeout_add(TIMER, timeout2, (gpointer) &timer_action);
 
 }
 
-/* function to draw the rectangular selection
+/* 
+ * function to draw the rectangular selection
  */
 static void
-paint_selection (cairo_t       *ci,
-                Detect * d)
+paint_selection (cairo_t *ci, Detect * d)
 {
 
 	double t =  microtime();
@@ -196,33 +204,32 @@ paint_selection (cairo_t       *ci,
           //printf("mouse: %d %d %d | ", mouse.prev_x, mouse.prev_y, mouse.bold);
           //printf("mouse: %f %f | %f %f \n", it_events->second.x, it_events->second.y, it_events->second.last[1].x, it_events->second.last[1].y);
 
-          /*cairo_set_source_rgba (ci, 255,0,0, 1.);
-          cairo_arc (ci, mouse.x,mouse.y, 20, 0, 2 * M_PI);
-          cairo_fill_preserve (ci);
-          cairo_stroke (ci);*/
+        /*cairo_set_source_rgba (ci, 255,0,0, 1.);
+        cairo_arc (ci, mouse.x,mouse.y, 20, 0, 2 * M_PI);
+        cairo_fill_preserve (ci);
+        cairo_stroke (ci);*/
 
-         //printf("%f %f\n",mouse->f_x,mouse->f_y);
-         //if(!(mouse->f_x>0 && mouse->f_y > 0)) return;
+        //printf("%f %f\n",mouse->f_x,mouse->f_y);
+        //if(!(mouse->f_x>0 && mouse->f_y > 0)) return;
 
-         //mouse->x = (int) (w-mouse->f_x*w);
-         //mouse->y = (int) (mouse->f_y*h);
-         //printf("(%d %d) %d %d < %f %f\n",w,h,mouse->x,mouse->y,mouse->f_x,mouse->f_y);
+        //mouse->x = (int) (w-mouse->f_x*w);
+        //mouse->y = (int) (mouse->f_y*h);
+        //printf("(%d %d) %d %d < %f %f\n",w,h,mouse->x,mouse->y,mouse->f_x,mouse->f_y);
 
-         /* proložení vykreslování */
-         float test_t = sqrt(pow(mouse.x-mouse.prev_x,2) + pow(mouse.y-mouse.prev_y,2));
+        /* proložení vykreslování */
+        float test_t = sqrt(pow(mouse.x-mouse.prev_x,2) + pow(mouse.y-mouse.prev_y,2));
 
-         int size_brush;
-         //omezení pokud jsou velké skoky
-         if(test_t==0 || test_t > 100) break;
-
+        int size_brush;
+        //omezení pokud jsou velké skoky
+        if(test_t==0 || test_t > 100) break;
 
         if(brush_type == 0){
-            size_brush = (mouse.bold/2)-5;
+            size_brush = (mouse.bold / 2) - 5;
             if(size_brush < 5) size_brush = 5;
             if(size_brush > 20) size_brush = 20;
             cairo_set_line_width (ci, 0.);
          } else {
-            size_brush = mouse.bold/10;
+            size_brush = mouse.bold / 10;
             if(size_brush > 5) size_brush = 5;
             if(size_brush < 1) size_brush = 1;
          }
@@ -311,24 +318,26 @@ paint_selection (cairo_t       *ci,
 
       if(cv_image!=NULL){
 
-         double t =  microtime();
+        double t =  microtime();
 
-         /* vypsání ladícího textu */
-         CvFont font;
-         double hScale=0.5;
-         double vScale=0.5;
-         int    lineWidth=1;
-         char buffer[125];
+        /* vypsání ladícího textu */
+        CvFont font;
+        double hScale=0.5;
+        double vScale=0.5;
+        int lineWidth=1;
+        char buffer[125];
 
-         cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale,vScale,0,lineWidth);
-         sprintf(buffer,"Treshold %d/255 [key m,n]",treshold);
-         cvPutText (cv_image,buffer,cvPoint(10,20), &font, cvScalar(0,255,0));
-         cvLine(cv_image,cvPoint(260,15),cvPoint(260+treshold,15),cvScalar(0,255,0),10,4);
+        cvFlip(cv_image, cv_image, 0);
 
-         sprintf(buffer,"Timer: %f | %f | %f | %f",timer[0], timer[1], timer[2],timer[3]);
-         cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255,0,0));
+         cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale, vScale, 0, lineWidth);
+         sprintf(buffer,"Treshold %d/255 [key m,n]", treshold);
+         cvPutText (cv_image, buffer, cvPoint(10, 20), &font, cvScalar(0, 255, 0));
+         cvLine(cv_image, cvPoint(260,15), cvPoint(260 + treshold,15), cvScalar(0, 255, 0), 10, 4);
+
+         sprintf(buffer,"Timer: %f | %f | %f | %f", timer[0], timer[1], timer[2], timer[3]);
+         cvPutText (cv_image,buffer,cvPoint(10,40), &font, cvScalar(255, 0, 0));
          sprintf(buffer,"Fps: %d ", fps);
-         cvPutText (cv_image,buffer,cvPoint(10,60), &font, cvScalar(255,0,0));
+         cvPutText (cv_image,buffer,cvPoint(10,60), &font, cvScalar(255, 0, 0));
 
          //převedení opencv do gtk
          GdkPixbuf * pix = gdk_pixbuf_new_from_data(
@@ -365,7 +374,7 @@ paint_selection (cairo_t       *ci,
 
    void CleanPaint(){
       cairo_t * ci = cairo_create (surface);
-      cairo_set_source_rgb (ci, 0.0,0.0,0.0);
+      cairo_set_source_rgb (ci, 0.0, 0.0, 0.0);
       cairo_paint (ci);
       cairo_destroy (ci);
    }
@@ -377,35 +386,35 @@ paint_selection (cairo_t       *ci,
    {
       //gint width, height;
 
-      Detect * d = (Detect *) dd;
-      cairo_t *cr;
-      cairo_t *ci;
+    Detect * d = (Detect *) dd;
+    cairo_t *cr;
+    cairo_t *ci;
 
-      //width  = widget->allocation.width;
-      //height = widget->allocation.height;
+    //width  = widget->allocation.width;
+    //height = widget->allocation.height;
 
-      // vykreslení kreslící plochy
-      ci = cairo_create (surface);
-      paint_selection (ci, d);
-      cairo_destroy (ci);
+    // vykreslení kreslící plochy
+    ci = cairo_create (surface);
+    paint_selection (ci, d);
+    cairo_destroy (ci);
 
-	cr = gdk_cairo_create (widget->window);
+    cr = gdk_cairo_create (widget->window);
 
-	// nastavení pozadí kreslící plochy
-	cairo_set_source_rgb (cr, 0.0,0.0,0.0);
+    // nastavení pozadí kreslící plochy
+    cairo_set_source_rgb (cr, 0.0, 0.0, 0.0);
 
-	cairo_paint (cr);
+    cairo_paint (cr);
 
-	cairo_set_source_surface(cr, surface, 0, 0);
-	cairo_mask_surface(cr, surface, 0, 0);
+    cairo_set_source_surface(cr, surface, 0, 0);
+    cairo_mask_surface(cr, surface, 0, 0);
 
-	cairo_destroy(cr);
+    cairo_destroy(cr);
 }
 
 
 /**
-	keyevents for paint windows thet is show by dataprojector
-*/
+ * keyevents for paint windows thet is show by dataprojector
+ **/
 static gboolean
 event_keypress (GtkWidget     *widget,
 				GdkEventKey *event )
@@ -414,52 +423,53 @@ event_keypress (GtkWidget     *widget,
 	//printf("debug color %d %c\n", event->keyval, event->keyval);
 	switch(event->keyval){
 	// key set color for brush
-	case 65456:
+	case 65438:
 	case '0':
 		sscanf(color_key[0],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65457:
+	case 65436:
 	case '1':
 		sscanf(color_key[1],"%2X%2X%2X",&r,&g,&b);
+        //printf("%s\n", color_key[1]);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65458:
+	case 65433:
 	case '2':
 		sscanf(color_key[2],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g =  g/255.0;
 		break;
-	case 65459:
+	case 65435:
 	case '3':
 		sscanf(color_key[3],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65460:
+	case 65430:
 	case '4':
 		sscanf(color_key[4],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65461:
+	case 65437:
 	case '5':
 		sscanf(color_key[5],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65462:
+	case 65432:
 	case '6':
 		sscanf(color_key[6],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65463:
+	case 65429:
 	case '7':
 		sscanf(color_key[7],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65464:
+	case 65431:
 	case '8':
 		sscanf(color_key[8],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
 		break;
-	case 65465:
+	case 65434:
 	case '9':
 		sscanf(color_key[9],"%2X%2X%2X",&r,&g,&b);
 		color.b = b/255.0; color.r = r/255.0; color.g = g/255.0;
@@ -483,7 +493,23 @@ event_keypress (GtkWidget     *widget,
 		CleanPaint();
 		break;
 
-	// vymazání plochy0
+	case 'r':
+		{
+
+        if (record_video == false){
+            printf("start record");
+//            writter_v = cvCreateVideoWriter(buffer_v, CV_FOURCC('M', 'J', 'P', 'G') , 20, cvSize(640,480),  1);
+            writter_v = cvCreateVideoWriter(buffer_v, CV_FOURCC('T','H','E','O') , 20, cvSize(640,480),  1);
+            record_video = true;
+        } else {
+            cvReleaseVideoWriter( &writter_v );
+            record_video = false;
+        }
+		
+		}
+		break;
+
+	// vymazání plochy
 	case 'c':
 		{
 			SavePaint();
@@ -583,9 +609,9 @@ void save_settings(void){
 		sprintf(buffer,"color_key_%d",i);
 		cvWriteString( fs, buffer, color_key[i] );
 	}
-	cvWriteInt( fs, "treshold",treshold);
-	cvWriteInt( fs, "filter_min",filter[0]);
-	cvWriteInt( fs, "filter_max",filter[1]);
+	cvWriteInt( fs, "treshold", treshold);
+	cvWriteInt( fs, "filter_min", filter[0]);
+	cvWriteInt( fs, "filter_max", filter[1]);
 	cvReleaseFileStorage( &fs);
 }
 
@@ -621,9 +647,9 @@ main (gint    argc,
 	  }
   }
 
-  printf("Number of device: %d \n",device);
+  printf("Number of device: %d \n", device);
 
-  MousePosition  mouse = {0,0,0,0,0,0,0};
+  MousePosition  mouse = {0, 0, 0, 0, 0, 0, 0};
 
   gtk_init (&argc, &argv);
 
@@ -718,7 +744,7 @@ main (gint    argc,
   freenect * frn  = new freenect();
   frn->init(0);
 
-  TimerAction timer_action = {d ,frn, &mouse, canvas, canvas_settings};
+  TimerAction timer_action = {d, frn, &mouse, canvas, canvas_settings};
 
   preload(timer_action);
   gtk_main ();
