@@ -223,7 +223,7 @@ paint_selection (cairo_t *ci, Detect * d)
         //omezení pokud jsou velké skoky
         if(test_t==0 || test_t > 100) break;
 
-        if(brush_type == 0){
+        if(brush_type == 0 || brush_type==3){
             size_brush = (mouse.bold / 2) - 5;
             if(size_brush < 5) size_brush = 5;
             if(size_brush > 20) size_brush = 20;
@@ -244,6 +244,8 @@ paint_selection (cairo_t *ci, Detect * d)
          double step_y = (mouse.y - mouse.prev_y)/(double) step;
 
          float aplha = 1.;
+
+         if (brush_type == 3) aplha = 0.3;
       
          if(brush_type == 2) {
             aplha = 0.2;
@@ -327,7 +329,7 @@ paint_selection (cairo_t *ci, Detect * d)
         int lineWidth=1;
         char buffer[125];
 
-        cvFlip(cv_image, cv_image, 0);
+        cvFlip(cv_image, cv_image, 1);
 
          cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale, vScale, 0, lineWidth);
          sprintf(buffer,"Treshold %d/255 [key m,n]", treshold);
@@ -420,7 +422,7 @@ event_keypress (GtkWidget     *widget,
 				GdkEventKey *event )
 {
 	unsigned int r,g,b;
-	//printf("debug color %d %c\n", event->keyval, event->keyval);
+	printf("debug color %d %c\n", event->keyval, event->keyval);
 	switch(event->keyval){
 	// key set color for brush
 	case 65438:
@@ -479,6 +481,10 @@ event_keypress (GtkWidget     *widget,
 	case '/':
 		brush_type = 0;
 		break;
+    case 65451:
+        brush_type = 3;
+        printf("type 3\n");
+        break;
 	case 65450:
 	case '+':
 		brush_type = 1;
@@ -497,7 +503,7 @@ event_keypress (GtkWidget     *widget,
 		{
 
         if (record_video == false){
-            printf("start record");
+           printf("start record");
 //            writter_v = cvCreateVideoWriter(buffer_v, CV_FOURCC('M', 'J', 'P', 'G') , 20, cvSize(640,480),  1);
             writter_v = cvCreateVideoWriter(buffer_v, CV_FOURCC('T','H','E','O') , 20, cvSize(640,480),  1);
             record_video = true;
