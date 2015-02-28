@@ -11,7 +11,7 @@
 <color_key_8>FFFF00</color_key_8>
 <color_key_9>"00FF00"</color_key_9>
 <color_key_10>"00000F"</color_key_10>
-<treshold>143</treshold>
+<treshold>151</treshold>
 <filter_min>500</filter_min>
 <filter_max>650</filter_max>
 </opencv_storage>

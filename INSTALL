@@ -14,4 +14,7 @@
 #Only one line:
 	sudo apt-get install libgtk2.0-dev libcv-dev libcvaux-dev libhighgui-dev python-opencv cmake g++
 
+# Fedora 21
+    sudo yum install opencv-devel gtk2-devel libfreenect-* 
+
 
